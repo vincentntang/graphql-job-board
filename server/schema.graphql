@@ -6,8 +6,19 @@ type Query {
 }
 
 # Mutations are side effects
+# type Mutation {
+#   # createJob(companyId: ID, title: String, description: String) :ID
+#   createJob(companyId: ID, title: String, description: String) :Job
+# }
 type Mutation {
-  createJob(companyId: ID, title: String, description: String) :ID
+  createJob(input: CreateJobInput) :Job
+}
+
+# Single argument per mutation = best practice
+input CreateJobInput {
+  companyId: ID
+  title: String
+  description: String
 }
 
 type Company {

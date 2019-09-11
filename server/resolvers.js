@@ -7,9 +7,11 @@ const Query = {
 };
 
 const Mutation = {
-  createJob: (root, {companyId, title, description}) => { 
+  createJob: (root, {input}) => { 
     console.log("MUTATION RAN")
-    return db.jobs.create({companyId, title, description}); // create is part of the fakeDB we're using
+    // return db.jobs.create({companyId, title, description}); // create is part of the fakeDB we're using
+    const id = db.jobs.create(input); // SIDE-EFFECT by making it a job object instead of id, now means we can grab more data from frontend
+    return db.jobs.get(id);
   }
 }
 
