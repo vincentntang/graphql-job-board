@@ -1,13 +1,19 @@
+import { isLoggedIn, getAccessToken } from "./auth";
+
 const endpointURL = 'http://localhost:9002/graphql'
 
 // This handles the POST request stringify and header stuff
 // as we recycle it often
 async function graphqlRequest(query, variables={}) {
-  const response = await fetch(endpointURL, {
+  const request = {
     method: 'POST',
     headers: {'content-type': 'application/json'},
     body: JSON.stringify({ query, variables})
-  });
+  }
+  if (isLoggedIn()) {
+    request.headers['authorization'] = 'Bearer ' + getAccessToken(); // this grabs off local storage
+  }
+  const response = await fetch(endpointURL, request );
   const responseBody = await response.json();
   if (responseBody.errors) {
     const message = responseBody.errors.map((error) => error.message).join('\n'); // Handles error checking
