@@ -21,3 +21,19 @@ Querying twice in a row, means you have to have two resolve cases
   }
 }
 ```
+
+JobQuery is an optional name but might be useful for debugging. Using the word `query` is necessary when passing variables
+
+```
+query JobQuery {
+  job(id: "rJKAbDd_z"){
+    id
+    title
+    company {
+      id
+      name
+    }
+    description
+  }
+}
+```
