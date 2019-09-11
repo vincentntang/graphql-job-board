@@ -15,6 +15,8 @@ const Job = {
   company: (job) => db.companies.get(job.companyId)
 }
 
-
+// Basically, check the first query
+// If it sees a nested list, match it with that specific name
+// Query, Company, Job doesn't mean anything
 
 module.exports = { Query, Company, Job};
