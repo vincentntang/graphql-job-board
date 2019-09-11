@@ -1,7 +1,13 @@
+# Query fetches data, no side effects
 type Query {
   company(id: ID!): Company
-  job(id: ID!): Job # Arguments
+  job(id: ID!): Job # job(id:ID!) these are it's arguments allowed, job() has datatype of Job
   jobs: [Job]
+}
+
+# Mutations are side effects
+type Mutation {
+  createJob(companyId: ID, title: String, description: String) :ID
 }
 
 type Company {
