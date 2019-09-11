@@ -16,7 +16,7 @@ export class JobForm extends Component {
     event.preventDefault();
     const companyId = 'SJV0-wdOM'; //FIXME
     const {title,description} = this.state;
-    // Here's the job input data
+    // create job... -> requests -> graphql payload -> schema (input type match) -> resolver
     createJob({companyId, title, description}).then((job) => {
       this.props.history.push(`/jobs/${job.id}`)
     });

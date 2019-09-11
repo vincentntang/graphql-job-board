@@ -22,9 +22,16 @@ app.use(cors(), bodyParser.json(), expressJwt({
   credentialsRequired: false
 }));
 
-app.use('/graphql', graphqlExpress({schema}))
+// graphql is our main endpoint
+app.use('/graphql', graphqlExpress((req) => ({
+  schema,
+  context: {user: req.user}
+})));
+
+// This is our playground endpoint
 app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
 
+// I think this is an old endpoint - tba removed later
 app.post('/login', (req, res) => {
   const {email, password} = req.body;
   const user = db.users.list().find((user) => user.email === email);

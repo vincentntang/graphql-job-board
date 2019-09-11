@@ -37,3 +37,5 @@ query JobQuery {
   }
 }
 ```
+
+expressJwt used here for generating token
