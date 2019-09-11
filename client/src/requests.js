@@ -23,6 +23,7 @@ async function graphqlRequest(query, variables={}) {
 }
 
 export async function createJob(input) {
+  console.log(input, "async function createJob");
   const query = `mutation CreateJob($input: CreateJobInput){
     job: createJob(input: $input) {
       id

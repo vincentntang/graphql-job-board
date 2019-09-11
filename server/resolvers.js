@@ -16,15 +16,17 @@ const Query = {
 
 const Mutation = {
   createJob: (root, {input}, {user}) => { // {user} = context.user
+    console.log('user:', user); // { id: 'BJrp-DudG', email: 'alice@facegle.io', password: 'alice123', companyId: 'HJRa-DOuG' } 
+    console.log('input', input); // {title: 'Test Job 1, description: 'Just a test'}
     if (!user) {
       throw new Error('Unauthorized');
     }
-    const id = db.jobs.create(input); // SIDE-EFFECT by making it a job object instead of id, now means we can grab more data from frontend
+    const id = db.jobs.create({companyId: user.companyId, ...input}); // this creates a new job.json file with all the company data
     return db.jobs.get(id);
-    // console.log('context:', context); // context: { user: { sub: 'BJrp-DudG', iat: 1568206680 } }
-    // return null;
   }
 }
+// const id = db.jobs.create(input); // SIDE-EFFECT by making it a job object instead of id, now means we can grab more data from frontend
+// console.log('context:', context); // context: { user: { sub: 'BJrp-DudG', iat: 1568206680 } }
 
 const Company = {
   jobs: (company) => db.jobs.list()

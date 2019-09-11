@@ -25,7 +25,8 @@ app.use(cors(), bodyParser.json(), expressJwt({
 // graphql is our main endpoint
 app.use('/graphql', graphqlExpress((req) => ({
   schema,
-  context: {user: req.user}
+  context: {user: req.user && db.users.get(req.user.sub)} //context is { id: 'BJrp-DudG', email: 'alice@facegle.io', password: 'alice123', companyId: 'HJRa-DOuG' } 
+  // context: {user: req.user} // context only has user id {id: 'BJrp-DudG'}
 })));
 
 // This is our playground endpoint

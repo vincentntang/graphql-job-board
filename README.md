@@ -39,3 +39,5 @@ query JobQuery {
 ```
 
 expressJwt used here for generating token
+
+STOPPED AT VIDEO 23 - It worked fine on insomnia, but it had problems when testing it on client with end user

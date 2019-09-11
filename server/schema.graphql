@@ -16,7 +16,7 @@ type Mutation {
 
 # Single argument per mutation = best practice
 input CreateJobInput {
-  companyId: ID
+  # companyId: ID
   title: String
   description: String
 }
