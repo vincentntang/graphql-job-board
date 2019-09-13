@@ -5,10 +5,13 @@ const endpointURL = 'http://localhost:9002/graphql'
 // This handles the POST request stringify and header stuff
 // as we recycle it often
 async function graphqlRequest(query, variables={}) {
+  const body = JSON.stringify({ query, variables})
+  console.log(body, "body");
+  console.log("I RAN");
   const request = {
     method: 'POST',
     headers: {'content-type': 'application/json'},
-    body: JSON.stringify({ query, variables})
+    body,
   }
   if (isLoggedIn()) {
     request.headers['authorization'] = 'Bearer ' + getAccessToken(); // this grabs off local storage
