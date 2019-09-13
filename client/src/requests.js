@@ -1,48 +1,72 @@
+import { ApolloClient, ApolloLink, HttpLink , InMemoryCache} from 'apollo-boost';
+import gql from 'graphql-tag';
 import { isLoggedIn, getAccessToken } from "./auth";
 
 const endpointURL = 'http://localhost:9002/graphql'
 
+const authLink = new ApolloLink((operation, forward) => {
+  if(isLoggedIn()) {
+    // request.headers['authorization'] = 'Bearer ' + getAccessTokoen();
+    operation.setContext({
+      headers: {
+        'authorization': 'Bearer ' + getAccessToken()
+      }
+    });
+  }
+  return forward(operation);
+})
+
+const client = new ApolloClient({
+  link: ApolloLink.from ([
+    authLink, // get authorized before sending off any http requests
+    new HttpLink({uri: endpointURL}), // communicates to server, what allows gql requests
+  ]),
+  cache: new InMemoryCache() // In memory cache prevents calling data when you have it already
+});
+
 // This handles the POST request stringify and header stuff
 // as we recycle it often
-async function graphqlRequest(query, variables={}) {
-  const body = JSON.stringify({ query, variables})
-  console.log(body, "body");
-  console.log("I RAN");
-  const request = {
-    method: 'POST',
-    headers: {'content-type': 'application/json'},
-    body,
-  }
-  if (isLoggedIn()) {
-    request.headers['authorization'] = 'Bearer ' + getAccessToken(); // this grabs off local storage
-  }
-  const response = await fetch(endpointURL, request );
-  const responseBody = await response.json();
-  if (responseBody.errors) {
-    const message = responseBody.errors.map((error) => error.message).join('\n'); // Handles error checking
-    throw new Error(message);
-  }
-  return responseBody.data;
-}
+// async function graphqlRequest(query, variables={}) {
+//   const body = JSON.stringify({ query, variables})
+//   console.log(body, "body");
+//   console.log("I RAN");
+//   const request = {
+//     method: 'POST',
+//     headers: {'content-type': 'application/json'},
+//     body,
+//   }
+//   // if (isLoggedIn()) {
+//   //   request.headers['authorization'] = 'Bearer ' + getAccessToken(); // this grabs off local storage
+//   // }
+//   const response = await fetch(endpointURL, request );
+//   const responseBody = await response.json();
+//   if (responseBody.errors) {
+//     const message = responseBody.errors.map((error) => error.message).join('\n'); // Handles error checking
+//     throw new Error(message);
+//   }
+//   return responseBody.data;
+// }
 
 export async function createJob(input) {
   console.log(input, "async function createJob");
-  const query = `mutation CreateJob($input: CreateJobInput){
-    job: createJob(input: $input) {
-      id
-      title
-      company {
+  const mutation = gql`
+    mutation CreateJob($input: CreateJobInput){
+      job: createJob(input: $input) {
         id
-        name
+        title
+        company {
+          id
+          name
+        }
       }
-    }
-  }`;
-  const {job} = await graphqlRequest(query,{input});
+    }`;
+  // const {job} = await graphqlRequest(query,{input});
+  const {data: {job}} = await client.mutate({mutation, variables: {input}});
   return job;
 }
 
 export async function loadCompany(id) {
-  const query = `query CompanyQuery($id : ID!) {
+  const query = gql`query CompanyQuery($id : ID!) {
     company(id: $id) {
       id
       name
@@ -54,24 +78,38 @@ export async function loadCompany(id) {
     }
   }`;
 
-  const {company} = await graphqlRequest(query, {id});
+  // const {company} = await graphqlRequest(query, {id});
+  const {data: {company}} = await client.query({query, variables: {id}});
   return company;
 }
 
 export async function loadJob(id) {
-  const query = `query JobQuery($id: ID!) {
-    job(id: $id){
-      id
-      title
-      company {
+  // const query = `query JobQuery($id: ID!) {
+  //   job(id: $id){
+  //     id
+  //     title
+  //     company {
+  //       id
+  //       name
+  //     }
+  //     description
+  //   }
+  // }`
+  const query = gql`query JobQuery($id: ID!) {
+      job(id: $id){
         id
-        name
+        title
+        company {
+          id
+          name
+        }
+        description
       }
-      description
-    }
-  }`
-  const { job} = await graphqlRequest(query, {id});
-  return job
+    }`
+  const {data: {job}} = await client.query({query, variables: {id}});
+  return job;
+  // const { job} = await graphqlRequest(query, {id});
+  // return job
 }
 
 // export async function loadJob(id) {
@@ -98,7 +136,7 @@ export async function loadJob(id) {
 // }
 
 export async function loadJobs() {
-  const query = `{
+  const query = gql`{
     jobs {
       id
       title
@@ -108,7 +146,8 @@ export async function loadJobs() {
       }
     }
   }`
-  const {jobs} = await graphqlRequest(query)
+  // const {jobs} = await graphqlRequest(query)
+  const {data: {jobs}} = await client.query({query});
   return jobs;
 }
 
